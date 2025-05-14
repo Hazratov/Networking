@@ -20,12 +20,15 @@ jobs:
 
     - name: Copy project files to server
       run: |
-        rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./dev/crm/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/Networking/
+        rsync -avz \
+          --rsync-path="mkdir -p /root/Networking && rsync" \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          ./dev/crm/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/root/Networking/
 
     - name: Run remote deploy commands
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          cd ~/Networking
+          cd /root/Networking
           source venv/bin/activate
           pip install -r dev/crm/requirements.txt
           python dev/crm/manage.py migrate
