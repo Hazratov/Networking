@@ -2,27 +2,36 @@
 
 {% block content %}
     
-    <body>
+<body>
+    <br><br>
+
+    <div class="text-center">
+
+        <h3>Welcome to Wholesale CRM</h3>
 
         <br>
+
+        <h5>Effortlessly manage your customer relationships and sales pipeline.</h5>
+
+        <hr><br>
+
+        <p>
+            Our CRM helps your team stay organized, follow up with clients, and close deals faster.
+            With features like lead tracking, customer contact history, and sales stage management —
+            your wholesale business will never miss an opportunity.
+        </p>
+
+        <p>
+            Whether you're a growing business or an established distributor, Wholesale CRM adapts to your workflow.
+        </p>
+
         <br>
 
-        <div class="text-center">
+        <a class="btn btn-primary" type="button" href="{% url 'register' %}">
+            Create your account &nbsp; <i class="fa fa-user-plus" aria-hidden="true"></i>
+        </a>
 
-            <h3> ProjectX... Management at it's finest! </h3>
-
-            <br>
-
-            <h5> Keep track of your records effectively! </h5>
-
-            <hr>
-            <br>
-
-            <a class="btn btn-primary" type="button" href="{% url 'register' %}"> Create your account &nbsp; <i class="fa fa-user-plus" aria-hidden="true"></i> </a>
-
-        </div>
-
-    </body>        
-
+    </div>
+</body>
 
 {% endblock %}

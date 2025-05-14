@@ -1,0 +1,30 @@
+{% extends 'webapp/base.html' %}
+
+{% block content %}
+<h2>All Leads</h2>
+
+<a href="{% url 'create-lead' %}" class="btn btn-success mb-3">+ Create Lead</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Assigned to</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lead in leads %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ lead.customer.first_name }} {{ lead.customer.last_name }}</td>
+            <td>{{ lead.get_status_display }}</td>
+            <td>{{ lead.assigned_to.username }}</td>
+            <td>{{ lead.created_at|date:"M d, Y" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

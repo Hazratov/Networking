@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
-from .forms import CreateUserForm, LoginForm, CreateRecordForm, UpdateRecordForm
+from .forms import CreateUserForm, LoginForm, CreateRecordForm, UpdateRecordForm, CreateLeadForm, CreateCommunicationForm
 
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 
 from django.contrib.auth.decorators import login_required
 
-from .models import Record
+from .models import Record, Lead, Communication
 
 from django.contrib import messages
 
@@ -74,10 +74,15 @@ def my_login(request):
 
 @login_required(login_url='my-login')
 def dashboard(request):
+    my_records = Record.objects.filter(created_by=request.user)
+    my_leads = Lead.objects.filter(assigned_to=request.user)
+    my_communications = Communication.objects.filter(customer__created_by=request.user)
 
-    my_records = Record.objects.all()
-
-    context = {'records': my_records}
+    context = {
+        'records': my_records,
+        'leads': my_leads,
+        'communications': my_communications,
+    }
 
     return render(request, 'webapp/dashboard.html', context=context)
 
@@ -86,24 +91,17 @@ def dashboard(request):
 
 @login_required(login_url='my-login')
 def create_record(request):
-
     form = CreateRecordForm()
-
     if request.method == "POST":
-
         form = CreateRecordForm(request.POST)
-
         if form.is_valid():
-
-            form.save()
-
-            messages.success(request, "Your record was created!")
-
+            record = form.save(commit=False)
+            record.created_by = request.user
+            record.save()
+            messages.success(request, "Your client was created!")
             return redirect("dashboard")
-
     context = {'form': form}
-
-    return render(request, 'webapp/create-record.html', context=context)
+    return render(request, 'webapp/create-record.html', context)
 
 
 # - Update a record 
@@ -169,6 +167,44 @@ def user_logout(request):
 
     return redirect("my-login")
 
+
+# - List all leads
+@login_required(login_url='my-login')
+def lead_list(request):
+    leads = Lead.objects.all()
+    context = {'leads': leads}
+    return render(request, 'webapp/lead-list.html', context)
+
+# - Create a lead
+@login_required(login_url='my-login')
+def create_lead(request):
+    form = CreateLeadForm()
+    if request.method == "POST":
+        form = CreateLeadForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Lead created!")
+            return redirect("dashboard")
+    return render(request, 'webapp/create-lead.html', {'form': form})
+
+# - List communication logs
+@login_required(login_url='my-login')
+def communication_list(request):
+    logs = Communication.objects.all()
+    context = {'logs': logs}
+    return render(request, 'webapp/communication-list.html', context)
+
+# - Create a communication log
+@login_required(login_url='my-login')
+def create_communication(request):
+    form = CreateCommunicationForm()
+    if request.method == "POST":
+        form = CreateCommunicationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Communication log saved!")
+            return redirect("dashboard")
+    return render(request, 'webapp/create-communication.html', {'form': form})
 
 
 

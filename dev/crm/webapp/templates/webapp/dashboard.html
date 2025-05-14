@@ -8,7 +8,7 @@
 
     <a class="btn btn-outline-primary btn-sm" href="{% url 'create-record' %}">
 
-        Create a new record &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        Create a new customer &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
 
     </a>
 
@@ -30,6 +30,7 @@
                 <th scope="col"> Country </th>
 
                 <th scope="col"> Date joined </th>
+                <th scope="col"> Assignment to </th>
 
                 <th scope="col"> View </th>
 
@@ -58,6 +59,7 @@
                 <td> {{record.country}} </td>
 
                 <td> {{record.creation_date}} </td>
+                <td>{{ record.created_by }}</td>
 
                 <td> <a class="btn btn-success btn-sm" href="{% url 'record' record.id %}"> <i class="fa fa-eye" aria-hidden="true"></i> </a> </td>
 
@@ -72,6 +74,71 @@
 
 
     </table>
+
+    <hr>
+    <a class="btn btn-outline-primary btn-sm" href="{% url 'create-lead' %}">
+
+        Create a new lead &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+
+    </a>
+
+    <hr>
+    <h5>Leads</h5>
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Note</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lead in leads %}
+            <tr>
+                <td>{{ lead.id }}</td>
+                <td>{{ lead.customer.first_name }} {{ lead.customer.last_name }}</td>
+                <td>{{ lead.status }}</td>
+                <td>{{ lead.note }}</td>
+                <td>{{ lead.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+    <a class="btn btn-outline-primary btn-sm" href="{% url 'create-communication' %}">
+
+        Create a new Communication &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+
+    </a>
+
+    <hr>
+    <h5>Communications</h5>
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Type</th>
+                <th>Note</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for com in communications %}
+            <tr>
+                <td>{{ com.id }}</td>
+                <td>{{ com.customer.first_name }} {{ com.customer.last_name }}</td>
+                <td>{{ com.type }}</td>
+                <td>{{ com.note }}</td>
+                <td>{{ com.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
 
 
 {% endblock %}
