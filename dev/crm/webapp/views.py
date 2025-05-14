@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.shortcuts import render, redirect
 from .forms import CreateUserForm, LoginForm, CreateRecordForm, UpdateRecordForm, CreateLeadForm, CreateCommunicationForm
 
@@ -78,14 +79,34 @@ def dashboard(request):
     my_leads = Lead.objects.filter(assigned_to=request.user)
     my_communications = Communication.objects.filter(customer__created_by=request.user)
 
+    # Chart data tayyorlash (status/count)
+    lead_status_data = (
+        my_leads.values('status')
+        .annotate(count=Count('id'))
+    )
+    comm_type_data = (
+        my_communications.values('type')
+        .annotate(count=Count('id'))
+    )
+
+    # Python listlarni tayyorlab olish
+    lead_status_labels = [item['status'] for item in lead_status_data]
+    lead_status_counts = [item['count'] for item in lead_status_data]
+
+    comm_type_labels = [item['type'] for item in comm_type_data]
+    comm_type_counts = [item['count'] for item in comm_type_data]
+
     context = {
         'records': my_records,
         'leads': my_leads,
         'communications': my_communications,
+        'lead_status_labels': lead_status_labels,
+        'lead_status_counts': lead_status_counts,
+        'comm_type_labels': comm_type_labels,
+        'comm_type_counts': comm_type_counts,
     }
 
     return render(request, 'webapp/dashboard.html', context=context)
-
 
 # - Create a record 
 

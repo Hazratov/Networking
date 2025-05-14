@@ -1,144 +1,196 @@
 {% extends 'webapp/base.html' %}
 
 {% block content %}
+<div class="container py-4">
 
-    <h5> Welcome, {{user}}! 👋 </h5>
+    <h3 class="mb-4">Welcome, {{ user.username }}! 👋</h3>
 
-    <hr>
+    <!-- RECORD SECTION -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Customers</h5>
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'create-record' %}">
+                + New Customer
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>City</th>
+                            <th>Province</th>
+                            <th>Country</th>
+                            <th>Joined</th>
+                            <th>Created By</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>{{ record.id }}</td>
+                            <td>{{ record.first_name }} {{ record.last_name }}</td>
+                            <td>{{ record.email }}</td>
+                            <td>{{ record.phone }}</td>
+                            <td>{{ record.address }}</td>
+                            <td>{{ record.city }}</td>
+                            <td>{{ record.province }}</td>
+                            <td>{{ record.country }}</td>
+                            <td>{{ record.creation_date }}</td>
+                            <td>{{ record.created_by }}</td>
+                            <td>
+                                <a class="btn btn-success btn-sm" href="{% url 'record' record.id %}">
+                                    <i class="fa fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    <a class="btn btn-outline-primary btn-sm" href="{% url 'create-record' %}">
+    <!-- LEADS SECTION -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Leads</h5>
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'create-lead' %}">
+                + New Lead
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Note</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in leads %}
+                        <tr>
+                            <td>{{ lead.id }}</td>
+                            <td>{{ lead.customer.first_name }} {{ lead.customer.last_name }}</td>
+                            <td>{{ lead.status }}</td>
+                            <td>{{ lead.note }}</td>
+                            <td>{{ lead.created_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-        Create a new customer &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+    <!-- COMMUNICATIONS SECTION -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Communications</h5>
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'create-communication' %}">
+                + New Communication
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Type</th>
+                            <th>Note</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for com in communications %}
+                        <tr>
+                            <td>{{ com.id }}</td>
+                            <td>{{ com.customer.first_name }} {{ com.customer.last_name }}</td>
+                            <td>{{ com.type }}</td>
+                            <td>{{ com.note }}</td>
+                            <td>{{ com.date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    </a>
+    <!-- CHARTS SECTION -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    Lead Status Chart
+                </div>
+                <div class="card-body">
+                    <canvas id="leadsChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
 
-    <hr> 
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    Communication Type Chart
+                </div>
+                <div class="card-body">
+                    <canvas id="commChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <table class="table table-hover table-bordered">
+</div>
 
-        <thead class="table-light">
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Lead chart
+    const leadStatusLabels = {{ lead_status_labels|safe }};
+    const leadStatusCounts = {{ lead_status_counts|safe }};
 
-            <tr>
+    const leadsCtx = document.getElementById('leadsChart').getContext('2d');
+    new Chart(leadsCtx, {
+        type: 'pie',
+        data: {
+            labels: leadStatusLabels,
+            datasets: [{
+                label: 'Lead Status',
+                data: leadStatusCounts,
+                backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6610f2']
+            }]
+        }
+    });
 
-                <th scope="col"> ID </th>
-                <th scope="col"> Full name </th>
-                <th scope="col"> Email </th>
-                <th scope="col"> Phone </th>
-                <th scope="col"> Address </th>
-                <th scope="col"> City </th>
-                <th scope="col"> Province </th>
-                <th scope="col"> Country </th>
+    // Communication chart
+    const commTypeLabels = {{ comm_type_labels|safe }};
+    const commTypeCounts = {{ comm_type_counts|safe }};
 
-                <th scope="col"> Date joined </th>
-                <th scope="col"> Assignment to </th>
-
-                <th scope="col"> View </th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-        {% if records %}
-
-            {% for record in records %}
-
-            <tr>
-
-                <td> {{record.id}} </td>
-
-                <td> {{record.first_name}}  {{record.last_name}} </td>
-
-                <td> {{record.email}} </td>
-
-                <td> {{record.phone}} </td>
-                <td> {{record.address}} </td>
-                <td> {{record.city}} </td>
-                <td> {{record.province}} </td>
-                <td> {{record.country}} </td>
-
-                <td> {{record.creation_date}} </td>
-                <td>{{ record.created_by }}</td>
-
-                <td> <a class="btn btn-success btn-sm" href="{% url 'record' record.id %}"> <i class="fa fa-eye" aria-hidden="true"></i> </a> </td>
-
-            </tr>
-
-            {% endfor %}
-        
-        {% endif %}
-
-
-        </tbody>
-
-
-    </table>
-
-    <hr>
-    <a class="btn btn-outline-primary btn-sm" href="{% url 'create-lead' %}">
-
-        Create a new lead &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
-
-    </a>
-
-    <hr>
-    <h5>Leads</h5>
-    <table class="table table-bordered">
-        <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Customer</th>
-                <th>Status</th>
-                <th>Note</th>
-                <th>Created At</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for lead in leads %}
-            <tr>
-                <td>{{ lead.id }}</td>
-                <td>{{ lead.customer.first_name }} {{ lead.customer.last_name }}</td>
-                <td>{{ lead.status }}</td>
-                <td>{{ lead.note }}</td>
-                <td>{{ lead.created_at }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <hr>
-    <a class="btn btn-outline-primary btn-sm" href="{% url 'create-communication' %}">
-
-        Create a new Communication &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
-
-    </a>
-
-    <hr>
-    <h5>Communications</h5>
-    <table class="table table-bordered">
-        <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Customer</th>
-                <th>Type</th>
-                <th>Note</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for com in communications %}
-            <tr>
-                <td>{{ com.id }}</td>
-                <td>{{ com.customer.first_name }} {{ com.customer.last_name }}</td>
-                <td>{{ com.type }}</td>
-                <td>{{ com.note }}</td>
-                <td>{{ com.date }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-
-
+    const commCtx = document.getElementById('commChart').getContext('2d');
+    new Chart(commCtx, {
+        type: 'bar',
+        data: {
+            labels: commTypeLabels,
+            datasets: [{
+                label: 'Communication Types',
+                data: commTypeCounts,
+                backgroundColor: ['#17a2b8', '#6f42c1', '#fd7e14']
+            }]
+        }
+    });
+</script>
 {% endblock %}
