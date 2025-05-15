@@ -67,7 +67,7 @@ def create_communications(records):
 
 if __name__ == '__main__':
     print("📦 Mavjud foydalanuvchilar bilan test ma'lumotlari yaratilmoqda...")
-    records = create_records(10)
+    records = create_records(100)
     if records:
         create_leads(records)
         create_communications(records)

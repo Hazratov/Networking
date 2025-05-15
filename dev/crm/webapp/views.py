@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.db.models import Count
 from django.shortcuts import render, redirect
 from .forms import CreateUserForm, LoginForm, CreateRecordForm, UpdateRecordForm, CreateLeadForm, CreateCommunicationForm
@@ -75,21 +76,30 @@ def my_login(request):
 
 @login_required(login_url='my-login')
 def dashboard(request):
+    # Filter
     my_records = Record.objects.filter(created_by=request.user)
     my_leads = Lead.objects.filter(assigned_to=request.user)
     my_communications = Communication.objects.filter(customer__created_by=request.user)
 
-    # Chart data tayyorlash (status/count)
-    lead_status_data = (
-        my_leads.values('status')
-        .annotate(count=Count('id'))
-    )
-    comm_type_data = (
-        my_communications.values('type')
-        .annotate(count=Count('id'))
-    )
+    # === PAGINATE ===
+    record_paginator = Paginator(my_records, 10)  # Har sahifada 10 ta record
+    lead_paginator = Paginator(my_leads, 10)
+    comm_paginator = Paginator(my_communications, 10)
 
-    # Python listlarni tayyorlab olish
+    # GET so‘rovdan sahifa raqamini olish
+    record_page_number = request.GET.get('record_page')
+    lead_page_number = request.GET.get('lead_page')
+    comm_page_number = request.GET.get('comm_page')
+
+    # Sahifadagi elementlar
+    records_page = record_paginator.get_page(record_page_number)
+    leads_page = lead_paginator.get_page(lead_page_number)
+    comms_page = comm_paginator.get_page(comm_page_number)
+
+    # Diagrammalar uchun data
+    lead_status_data = my_leads.values('status').annotate(count=Count('id'))
+    comm_type_data = my_communications.values('type').annotate(count=Count('id'))
+
     lead_status_labels = [item['status'] for item in lead_status_data]
     lead_status_counts = [item['count'] for item in lead_status_data]
 
@@ -97,9 +107,9 @@ def dashboard(request):
     comm_type_counts = [item['count'] for item in comm_type_data]
 
     context = {
-        'records': my_records,
-        'leads': my_leads,
-        'communications': my_communications,
+        'records': records_page,
+        'leads': leads_page,
+        'communications': comms_page,
         'lead_status_labels': lead_status_labels,
         'lead_status_counts': lead_status_counts,
         'comm_type_labels': comm_type_labels,

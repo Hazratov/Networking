@@ -56,6 +56,25 @@
             </div>
         </div>
     </div>
+<div class="card-footer">
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if records.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?record_page={{ records.previous_page_number }}">Previous</a>
+                </li>
+            {% endif %}
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ records.number }} of {{ records.paginator.num_pages }}</span>
+            </li>
+            {% if records.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?record_page={{ records.next_page_number }}">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
 
     <!-- LEADS SECTION -->
     <div class="card mb-4">
@@ -92,7 +111,25 @@
             </div>
         </div>
     </div>
-
+<div class="card-footer">
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if leads.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?lead_page={{ leads.previous_page_number }}">Previous</a>
+                </li>
+            {% endif %}
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ leads.number }} of {{ leads.paginator.num_pages }}</span>
+            </li>
+            {% if leads.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?lead_page={{ leads.next_page_number }}">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
     <!-- COMMUNICATIONS SECTION -->
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -128,6 +165,25 @@
             </div>
         </div>
     </div>
+<div class="card-footer">
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if communications.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?comm_page={{ communications.previous_page_number }}">Previous</a>
+                </li>
+            {% endif %}
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ communications.number }} of {{ communications.paginator.num_pages }}</span>
+            </li>
+            {% if communications.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?comm_page={{ communications.next_page_number }}">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
 
     <!-- CHARTS SECTION -->
     <div class="row">
