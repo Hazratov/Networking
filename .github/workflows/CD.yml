@@ -21,9 +21,9 @@ jobs:
     - name: Copy project files to server
       run: |
         rsync -avz \
-          --rsync-path="mkdir -p /root/Networking && rsync" \
+          --rsync-path="mkdir -p /root/Networking/dev/crm && rsync" \
           -e "ssh -o StrictHostKeyChecking=no" \
-          ./dev/crm/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/root/Networking/
+          ./dev/crm/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/root/Networking/dev/crm/
 
     - name: Run remote deploy commands
       run: |
@@ -33,6 +33,6 @@ jobs:
           pip install -r dev/crm/requirements.txt
           python dev/crm/manage.py migrate
           python dev/crm/manage.py collectstatic --noinput
-          sudo systemctl restart gunicorn
+          sudo systemctl restart django_crm
           sudo systemctl restart nginx
         EOF
