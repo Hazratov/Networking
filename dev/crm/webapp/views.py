@@ -1,7 +1,8 @@
 from django.core.paginator import Paginator
 from django.db.models import Count
 from django.shortcuts import render, redirect
-from .forms import CreateUserForm, LoginForm, CreateRecordForm, UpdateRecordForm, CreateLeadForm, CreateCommunicationForm
+from .forms import CreateUserForm, LoginForm, CreateRecordForm, UpdateRecordForm, CreateLeadForm, \
+    CreateCommunicationForm, UpdateCommunicationForm, UpdateLeadForm
 
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
@@ -118,6 +119,30 @@ def dashboard(request):
 
     return render(request, 'webapp/dashboard.html', context=context)
 
+
+# list customer
+
+def customer_table_view(request):
+    records = Record.objects.all()
+    record_page = request.GET.get('record_page')
+    record_paginator = Paginator(records, 10)
+    record_obj = record_paginator.get_page(record_page)
+    return render(request, 'webapp/customers_table.html', {'records': record_obj})
+
+def lead_table_view(request):
+    leads = Lead.objects.all()
+    lead_page = request.GET.get('lead_page')
+    lead_paginator = Paginator(leads, 10)
+    lead_obj = lead_paginator.get_page(lead_page)
+    return render(request, 'webapp/leads_table.html', {'leads': lead_obj})
+
+def communication_table_view(request):
+    communications = Communication.objects.all()
+    comm_page = request.GET.get('comm_page')
+    comm_paginator = Paginator(communications, 10)
+    comm_obj = comm_paginator.get_page(comm_page)
+    return render(request, 'webapp/communications_table.html', {'communications': comm_obj})
+
 # - Create a record 
 
 @login_required(login_url='my-login')
@@ -160,6 +185,33 @@ def update_record(request, pk):
 
     return render(request, 'webapp/update-record.html', context=context)
 
+
+# LEAD UPDATE
+@login_required(login_url='my-login')
+def update_lead(request, pk):
+    lead = Lead.objects.get(id=pk)
+    form = UpdateLeadForm(instance=lead)
+    if request.method == "POST":
+        form = UpdateLeadForm(request.POST, instance=lead)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Lead updated successfully!")
+            return redirect("leads-table")
+    return render(request, 'webapp/update-lead.html', {'form': form})
+
+
+# COMMUNICATION UPDATE
+@login_required(login_url='my-login')
+def update_communication(request, pk):
+    com = Communication.objects.get(id=pk)
+    form = UpdateCommunicationForm(instance=com)
+    if request.method == "POST":
+        form = UpdateCommunicationForm(request.POST, instance=com)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Communication updated successfully!")
+            return redirect("communications-table")
+    return render(request, 'webapp/update-communication.html', {'form': form})
 
 # - Read / View a singular record
 

@@ -1,98 +1,67 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm py-3">
+  <div class="container-fluid">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary justify-content-center">
-
-    <a class="navbar-brand main-heading" href="{% url '' %}"> 
-            
-      &nbsp; Wholesale Company
-
+    <!-- BRAND: Chap tomonda -->
+    <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">
+      <i class="fas fa-warehouse me-2"></i> Wholesale Company
     </a>
 
-
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-toggle="collapse"
-      data-target="#navbarNavDropdown"
-      aria-controls="navbarNavDropdown"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
+    <!-- TOGGLER: Mobil uchun -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+      aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
-
     </button>
 
+    <!-- NAVIGATION LINKS -->
+    <div class="collapse navbar-collapse" id="mainNavbar">
 
-      <div class="collapse navbar-collapse text-center" id="navbarNavDropdown">
-
-
-        <ul class="navbar-nav mr-auto">
-
-
-          &nbsp;     &nbsp;     &nbsp;
-
-          {% if user.is_authenticated %}
-
-            <li class="nav-item">
-
-              <a class="nav-link" href="{% url 'dashboard' %}">Dashboard &nbsp; <i class="fa fa-home" aria-hidden="true"></i> </a>
-
-            </li>
-              <li class="nav-item">
-
-              <a class="nav-link" href="{% url 'create-record' %}">Customers</a>
-
-            </li>
-              <li class="nav-item">
-
-              <a class="nav-link" href="{% url 'create-lead' %}">Leads</a>
-
-            </li>
-              <li class="nav-item">
-
-              <a class="nav-link" href="{% url 'create-communication' %}">Communication</a>
-
-            </li>
-
-
-            &nbsp;     &nbsp;     &nbsp;
-
-
-            <li class="nav-item">
-
-              <a class="nav-link" href="{% url 'user-logout' %}">Sign out &nbsp; <i class="fa fa-sign-out" aria-hidden="true"></i> </a>
-
-            </li>
-
-
-        </ul>
-
-        {% else %}
-
-        <li class="nav-item">
-
-          <a class="nav-link" href="{% url 'register' %}"> Register </a>
-
-        </li>
-
-
-        &nbsp;     &nbsp;     &nbsp;
-
-
-        <li class="nav-item">
-
-          <a class="nav-link" href="{% url 'my-login' %}">Login</a>
-
-        </li>
-
-
+      <!-- Center links -->
+      <ul class="navbar-nav mx-auto text-center">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'dashboard' %}">
+              <i class="fas fa-home me-1"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'customers-table' %}">
+              <i class="fas fa-users me-1"></i> Customers
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'leads-table' %}">
+              <i class="fas fa-lightbulb me-1"></i> Leads
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'communications-table' %}">
+              <i class="fas fa-comments me-1"></i> Communication
+            </a>
+          </li>
         {% endif %}
-      
-        
-      </div>
-  
-  
-  </nav>
+      </ul>
 
-
-
-
+      <!-- End links (Logout / Login / Register) -->
+      <ul class="navbar-nav ms-auto text-end">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'user-logout' %}">
+              <i class="fas fa-sign-out-alt me-1"></i> Sign out
+            </a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'register' %}">
+              <i class="fas fa-user-plus me-1"></i> Register
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'my-login' %}">
+              <i class="fas fa-sign-in-alt me-1"></i> Login
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>

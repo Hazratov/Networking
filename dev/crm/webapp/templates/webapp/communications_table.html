@@ -1,0 +1,66 @@
+{% extends 'webapp/base.html' %}
+
+{% block content %}
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Communications</h5>
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'create-communication' %}">
+            + New Communication
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-bordered mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Type</th>
+                        <th>Note</th>
+                        <th>Date</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for com in communications %}
+                    <tr>
+                        <td>{{ com.id }}</td>
+                        <td>{{ com.customer.first_name }} {{ com.customer.last_name }}</td>
+                        <td>{{ com.type }}</td>
+                        <td>{{ com.note }}</td>
+                        <td>{{ com.date }}</td>
+                        <td>
+                            <a href="{% url 'update-communication' com.id %}" class="btn btn-warning btn-sm">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer">
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if communications.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?comm_page={{ communications.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+                <li class="page-item disabled">
+                    <span class="page-link">Page {{ communications.number }} of {{ communications.paginator.num_pages }}</span>
+                </li>
+                {% if communications.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?comm_page={{ communications.next_page_number }}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+
+{% endblock %}
+

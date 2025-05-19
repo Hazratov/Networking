@@ -50,3 +50,32 @@ class CreateCommunicationForm(forms.ModelForm):
     class Meta:
         model = Communication
         fields = ['customer', 'type', 'note']
+
+        def __init__(self, *args, **kwargs):
+            super(CreateCommunicationForm, self).__init__(*args, **kwargs)
+            for field in self.fields.values():
+                field.widget.attrs['class'] = 'form-control'
+
+
+
+# - Update communication
+class UpdateCommunicationForm(forms.ModelForm):
+    class Meta:
+        model = Communication
+        fields = ['customer', 'type', 'note']
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateCommunicationForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
+
+class UpdateLeadForm(forms.ModelForm):
+    class Meta:
+        model = Lead
+        fields = ['customer', 'status', 'assigned_to', 'note']
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateLeadForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'

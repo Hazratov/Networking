@@ -24,6 +24,12 @@ urlpatterns = [
     path('communications', views.communication_list, name='communication-list'),
     path('communications/create', views.create_communication, name='create-communication'),
 
+    #list customer
+    path('customers-table/', views.customer_table_view, name='customers-table'),
+    path('leads-table/', views.lead_table_view, name='leads-table'),
+    path('communications-table/', views.communication_table_view, name='communications-table'),
+    path('update-lead/<int:pk>/', views.update_lead, name='update-lead'),
+    path('update-communication/<int:pk>/', views.update_communication, name='update-communication'),
 
 ]
 
