@@ -1,31 +1,130 @@
 {% extends 'webapp/base.html' %}
-
 {% block content %}
+
 <div class="container py-4">
 
-    <h3 class="mb-4">Welcome, {{ user.username }}! 👋</h3>
+    <h2 class="mb-4">Welcome back, {{ user.username }} 👋</h2>
 
+    <!-- STATS -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-primary shadow">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Customers</h5>
+                        <h3>{{ records.paginator.count }}</h3>
+                    </div>
+                    <i class="fa fa-users fa-2x"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-success shadow">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Leads</h5>
+                        <h3>{{ leads.count }}</h3>
+                    </div>
+                    <i class="fa fa-bullseye fa-2x"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-info shadow">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Communications</h5>
+                        <h3>{{ communications.count }}</h3>
+                    </div>
+                    <i class="fa fa-comments fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- CHARTS SECTION -->
+    <!-- CHARTS -->
     <div class="row">
         <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    Lead Status Chart
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <strong>Lead Status Overview</strong>
                 </div>
                 <div class="card-body">
-                    <canvas id="leadsChart" width="400" height="400"></canvas>
+                    <canvas id="leadsChart" height="250"></canvas>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    Communication Type Chart
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <strong>Communication Types</strong>
                 </div>
                 <div class="card-body">
-                    <canvas id="commChart" width="400" height="400"></canvas>
+                    <canvas id="commChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LATEST ENTRIES -->
+    <div class="row">
+        <!-- Latest Customers -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <strong>Latest Customers</strong>
+                </div>
+                <div class="card-body p-2">
+                    <ul class="list-group list-group-flush">
+                        {% for c in latest_customers %}
+                        <li class="list-group-item">
+                            {{ c.first_name }} {{ c.last_name }}
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-muted">No customers</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Latest Leads -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <strong>Latest Leads</strong>
+                </div>
+                <div class="card-body p-2">
+                    <ul class="list-group list-group-flush">
+                        {% for l in latest_leads %}
+                        <li class="list-group-item">
+                            {{ l.customer.first_name }} - {{ l.status }}
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-muted">No leads</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Latest Communications -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <strong>Latest Communications</strong>
+                </div>
+                <div class="card-body p-2">
+                    <ul class="list-group list-group-flush">
+                        {% for comm in latest_comms %}
+                        <li class="list-group-item">
+                            {{ comm.customer.first_name }} - {{ comm.type }}
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-muted">No communications</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>

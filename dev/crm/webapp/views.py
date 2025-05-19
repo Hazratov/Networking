@@ -77,27 +77,11 @@ def my_login(request):
 
 @login_required(login_url='my-login')
 def dashboard(request):
-    # Filter
     my_records = Record.objects.filter(created_by=request.user)
     my_leads = Lead.objects.filter(assigned_to=request.user)
     my_communications = Communication.objects.filter(customer__created_by=request.user)
 
-    # === PAGINATE ===
-    record_paginator = Paginator(my_records, 10)  # Har sahifada 10 ta record
-    lead_paginator = Paginator(my_leads, 10)
-    comm_paginator = Paginator(my_communications, 10)
-
-    # GET so‘rovdan sahifa raqamini olish
-    record_page_number = request.GET.get('record_page')
-    lead_page_number = request.GET.get('lead_page')
-    comm_page_number = request.GET.get('comm_page')
-
-    # Sahifadagi elementlar
-    records_page = record_paginator.get_page(record_page_number)
-    leads_page = lead_paginator.get_page(lead_page_number)
-    comms_page = comm_paginator.get_page(comm_page_number)
-
-    # Diagrammalar uchun data
+    # CHART DATA
     lead_status_data = my_leads.values('status').annotate(count=Count('id'))
     comm_type_data = my_communications.values('type').annotate(count=Count('id'))
 
@@ -107,17 +91,29 @@ def dashboard(request):
     comm_type_labels = [item['type'] for item in comm_type_data]
     comm_type_counts = [item['count'] for item in comm_type_data]
 
+    # LATEST 5 RECORDS
+    latest_customers = my_records.order_by('-id')[:5]
+    latest_leads = my_leads.order_by('-id')[:5]
+    latest_comms = my_communications.order_by('-id')[:5]
+
+    # PAGINATE (optional if using pagination elsewhere)
+    record_paginator = Paginator(my_records, 10)
+    records_page = record_paginator.get_page(request.GET.get('record_page'))
+
     context = {
         'records': records_page,
-        'leads': leads_page,
-        'communications': comms_page,
+        'leads': my_leads,
+        'communications': my_communications,
         'lead_status_labels': lead_status_labels,
         'lead_status_counts': lead_status_counts,
         'comm_type_labels': comm_type_labels,
         'comm_type_counts': comm_type_counts,
+        'latest_customers': latest_customers,
+        'latest_leads': latest_leads,
+        'latest_comms': latest_comms,
     }
 
-    return render(request, 'webapp/dashboard.html', context=context)
+    return render(request, 'webapp/dashboard.html', context)
 
 
 # list customer
