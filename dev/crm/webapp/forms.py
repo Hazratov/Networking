@@ -51,10 +51,10 @@ class CreateCommunicationForm(forms.ModelForm):
         model = Communication
         fields = ['customer', 'type', 'note']
 
-        def __init__(self, *args, **kwargs):
-            super(CreateCommunicationForm, self).__init__(*args, **kwargs)
-            for field in self.fields.values():
-                field.widget.attrs['class'] = 'form-control'
+    def __init__(self, *args, **kwargs):
+        super(CreateCommunicationForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
 
 
