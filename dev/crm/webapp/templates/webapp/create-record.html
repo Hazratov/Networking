@@ -3,15 +3,43 @@
 
 {% block content %}
 
-<div class="container mt-5">
-    <div class="card shadow rounded border-0">
-        <div class="card-body p-5">
-            <h3 class="card-title mb-1 text-primary">Create Customer</h3>
-            <p class="text-muted mb-4">Start adding the required details for your customer.</p>
+<!-- Custom Styles -->
+<style>
+    .card-header-gradient {
+        background: linear-gradient(135deg, #0ba29d, #c3ec52);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
 
+    .card-header-gradient h3 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .form-intro {
+        font-size: 0.95rem;
+        color: #ffffffcc;
+    }
+
+    .btn-lg {
+        padding: 0.6rem 1.5rem;
+        font-size: 1rem;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="card shadow border-0 rounded">
+        <!-- Gradient Header -->
+        <div class="card-header-gradient">
+            <h3><i class="fa fa-user-plus me-2"></i> Create Customer</h3>
+            <p class="form-intro mt-1">Please fill out the details below to register a new customer in the system.</p>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body p-4">
             <form method="POST" autocomplete="off">
                 {% csrf_token %}
-
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         {{ form.first_name|as_crispy_field }}
@@ -19,18 +47,15 @@
                     <div class="col-md-6 mb-3">
                         {{ form.last_name|as_crispy_field }}
                     </div>
-
                     <div class="col-md-6 mb-3">
                         {{ form.email|as_crispy_field }}
                     </div>
                     <div class="col-md-6 mb-3">
                         {{ form.phone|as_crispy_field }}
                     </div>
-
-                    <div class="col-md-12 mb-3">
+                    <div class="col-12 mb-3">
                         {{ form.address|as_crispy_field }}
                     </div>
-
                     <div class="col-md-4 mb-3">
                         {{ form.city|as_crispy_field }}
                     </div>
@@ -42,15 +67,15 @@
                     </div>
                 </div>
 
+                <!-- Actions -->
                 <div class="d-flex justify-content-between mt-4">
-                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">
-                        <i class="fa fa-arrow-left"></i> &nbsp; Return
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg">
+                        <i class="fa fa-arrow-left me-1"></i> Return
                     </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-check"></i> &nbsp; Create Customer
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fa fa-check me-1"></i> Create Customer
                     </button>
                 </div>
-
             </form>
         </div>
     </div>

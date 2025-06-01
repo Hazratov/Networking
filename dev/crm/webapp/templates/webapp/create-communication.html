@@ -3,46 +3,74 @@
 
 {% block content %}
 
+<style>
+    .gradient-header {
+        background: linear-gradient(135deg, #0ba29d, #c3ec52);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
+
+    .comm-intro {
+        background: #e9f7f5;
+        border-left: 5px solid #0ba29d;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        border-radius: 0.75rem;
+        font-size: 0.95rem;
+        color: #333;
+    }
+
+    .form-label {
+        font-weight: 600;
+    }
+</style>
+
 <div class="container mt-4">
-<div class="d-flex justify-content-between align-items-center mb-4">
-        <h3><i class="fa fa-user-plus text-primary"></i> &nbsp; Create a New Communication</h3>
+    <!-- Title -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="fa fa-comments text-primary"></i> &nbsp; Create a New Communication</h3>
         <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">⬅️ Back to Dashboard</a>
     </div>
-    <div class="card shadow-lg rounded-3">
-        <div class="col">
-            <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-header bg-gradient bg-primary text-white rounded-top-4">
-                    <h4 class="mb-0"><i class="fas fa-comments me-2"></i>New Communication</h4>
-                </div>
-                <div class="card-body">
 
-                    <form method="post" autocomplete="off">
-                        {% csrf_token %}
+    <!-- Optional Intro -->
+    <div class="comm-intro">
+        <i class="fa fa-info-circle me-1"></i>
+        Use this form to log a customer communication. Select type (call, email, meeting, etc.), enter notes, and link it to a customer for easy tracking.
+    </div>
 
-                        {% for field in form %}
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">{{ field.label }}</label>
-                                {{ field|add_class:"form-control form-control-lg" }}
+    <!-- Card -->
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="gradient-header">
+            <h4 class="mb-0"><i class="fas fa-comments me-2"></i> New Communication</h4>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" autocomplete="off">
+                {% csrf_token %}
 
-                                {% if field.help_text %}
-                                    <small class="form-text text-muted">{{ field.help_text }}</small>
-                                {% endif %}
+                <div class="row">
+                    {% for field in form %}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field|add_class:"form-control form-control-lg" }}
 
-                                {% for error in field.errors %}
-                                    <div class="text-danger small">{{ error }}</div>
-                                {% endfor %}
-                            </div>
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
                         {% endfor %}
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-paper-plane me-2"></i> Submit Communication
-                            </button>
-                        </div>
-                    </form>
-
+                    </div>
+                    {% endfor %}
                 </div>
-            </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i> Submit Communication
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

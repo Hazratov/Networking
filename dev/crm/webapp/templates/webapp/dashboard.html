@@ -1,128 +1,152 @@
 {% extends 'webapp/base.html' %}
+
 {% block content %}
 
+<!-- AOS CSS -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<style>
+    .card:hover {
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+        box-shadow: 0 0 10px rgba(13, 110, 253, 0.2);
+    }
+
+    .btn-rounded {
+        border-radius: 2rem;
+        font-weight: 600;
+        padding: 0.6rem 1.5rem;
+    }
+
+    .card-header-custom {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+</style>
+
 <div class="container py-4">
-
-    <h2 class="mb-4">Welcome back, {{ user.username }} 👋</h2>
-
-    <!-- STATS -->
+    <!-- KPI Cards -->
     <div class="row mb-4">
-        <div class="col-md-4 mb-3">
-            <div class="card text-white bg-primary shadow">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title">Customers</h5>
-                        <h3>{{ records.paginator.count }}</h3>
-                    </div>
-                    <i class="fa fa-users fa-2x"></i>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body text-center">
+                    <h5>Total Customers</h5>
+                    <h2>{{ total_customers }}</h2>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
-            <div class="card text-white bg-success shadow">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title">Leads</h5>
-                        <h3>{{ leads.count }}</h3>
-                    </div>
-                    <i class="fa fa-bullseye fa-2x"></i>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body text-center">
+                    <h5>Total Leads</h5>
+                    <h2>{{ total_leads }}</h2>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
-            <div class="card text-white bg-info shadow">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title">Communications</h5>
-                        <h3>{{ communications.count }}</h3>
-                    </div>
-                    <i class="fa fa-comments fa-2x"></i>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body text-center">
+                    <h5>Total Communications</h5>
+                    <h2>{{ total_communications }}</h2>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- CHARTS -->
+    <!-- Lead Conversion Rate -->
+    <div class="alert alert-warning text-center fw-bold" data-aos="zoom-in">
+        Lead Conversion Rate: {{ lead_conversion_rate }}%
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card mb-4" data-aos="zoom-in-up">
+        <div class="card-body d-flex justify-content-around">
+            <a href="{% url 'create-record' %}" class="btn btn-outline-success btn-rounded shadow-sm">+ New Customer</a>
+            <a href="{% url 'create-lead' %}" class="btn btn-outline-primary btn-rounded shadow-sm">+ New Lead</a>
+            <a href="{% url 'create-communication' %}" class="btn btn-outline-info btn-rounded shadow-sm">+ New Communication</a>
+        </div>
+    </div>
+
+    <!-- Charts -->
     <div class="row">
-        <div class="col-md-6 mb-4">
+        <div class="col-md-6 mb-4" data-aos="fade-up">
             <div class="card shadow">
-                <div class="card-header bg-light">
-                    <strong>Lead Status Overview</strong>
-                </div>
+                <div class="card-header card-header-custom">📊 Lead Status Overview</div>
                 <div class="card-body">
                     <canvas id="leadsChart" height="250"></canvas>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-6 mb-4">
+        <div class="col-md-6 mb-4" data-aos="fade-up" data-aos-delay="150">
             <div class="card shadow">
-                <div class="card-header bg-light">
-                    <strong>Communication Types</strong>
-                </div>
+                <div class="card-header card-header-custom">💬 Communication Types</div>
                 <div class="card-body">
                     <canvas id="commChart" height="250"></canvas>
                 </div>
             </div>
         </div>
+        <div class="col-md-12 mb-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="card shadow">
+                <div class="card-header card-header-custom">📈 Customer Growth</div>
+                <div class="card-body">
+                    <canvas id="customerGrowthChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- LATEST ENTRIES -->
+    <!-- Upcoming Communications -->
+    <h5 class="mt-5 mb-2" data-aos="fade-right">📅 Upcoming Communications (Next 7 Days)</h5>
+    <ul class="list-group mb-5" data-aos="fade-up">
+        {% for comm in upcoming_communications %}
+        <li class="list-group-item d-flex justify-content-between">
+            <span>{{ comm.customer.first_name }} - {{ comm.get_type_display }}</span>
+            <span class="text-muted">{{ comm.date|date:"M d, Y H:i" }}</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted">No communications in the next 7 days.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Latest Entries -->
     <div class="row">
-        <!-- Latest Customers -->
-        <div class="col-md-4 mb-4">
+        <div class="col-md-4 mb-4" data-aos="fade-up">
             <div class="card shadow">
-                <div class="card-header bg-light">
-                    <strong>Latest Customers</strong>
-                </div>
+                <div class="card-header card-header-custom">🧑‍💼 Latest Customers</div>
                 <div class="card-body p-2">
                     <ul class="list-group list-group-flush">
                         {% for c in latest_customers %}
-                        <li class="list-group-item">
-                            {{ c.first_name }} {{ c.last_name }}
-                        </li>
+                        <li class="list-group-item">{{ c.first_name }} {{ c.last_name }}</li>
                         {% empty %}
-                        <li class="list-group-item text-muted">No customers</li>
+                        <li class="list-group-item text-muted">No recent customers</li>
                         {% endfor %}
                     </ul>
                 </div>
             </div>
         </div>
-
-        <!-- Latest Leads -->
-        <div class="col-md-4 mb-4">
+        <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
             <div class="card shadow">
-                <div class="card-header bg-light">
-                    <strong>Latest Leads</strong>
-                </div>
+                <div class="card-header card-header-custom">🎯 Latest Leads</div>
                 <div class="card-body p-2">
                     <ul class="list-group list-group-flush">
                         {% for l in latest_leads %}
-                        <li class="list-group-item">
-                            {{ l.customer.first_name }} - {{ l.status }}
-                        </li>
+                        <li class="list-group-item">{{ l.customer.first_name }} - {{ l.status }}</li>
                         {% empty %}
-                        <li class="list-group-item text-muted">No leads</li>
+                        <li class="list-group-item text-muted">No recent leads</li>
                         {% endfor %}
                     </ul>
                 </div>
             </div>
         </div>
-
-        <!-- Latest Communications -->
-        <div class="col-md-4 mb-4">
+        <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
             <div class="card shadow">
-                <div class="card-header bg-light">
-                    <strong>Latest Communications</strong>
-                </div>
+                <div class="card-header card-header-custom">📞 Latest Communications</div>
                 <div class="card-body p-2">
                     <ul class="list-group list-group-flush">
                         {% for comm in latest_comms %}
-                        <li class="list-group-item">
-                            {{ comm.customer.first_name }} - {{ comm.type }}
-                        </li>
+                        <li class="list-group-item">{{ comm.customer.first_name }} - {{ comm.type }}</li>
                         {% empty %}
-                        <li class="list-group-item text-muted">No communications</li>
+                        <li class="list-group-item text-muted">No recent communications</li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -130,43 +154,69 @@
         </div>
     </div>
 
+    <!-- Activity Feed -->
+    <div class="card shadow mb-5" data-aos="fade-up">
+        <div class="card-header card-header-custom">⚡ Recent Activity</div>
+        <div class="card-body p-3" style="max-height: 300px; overflow-y: auto;">
+            <ul class="list-group list-group-flush">
+                {% for act in recent_activities %}
+                <li class="list-group-item small">
+                    <strong>{{ act.user.username }}</strong>
+                    {{ act.get_action_display }} <span class="text-info">{{ act.model }}</span>: "{{ act.object_name }}"
+                    <br>
+                    <small class="text-muted">{{ act.timestamp|date:"M d, Y H:i" }}</small>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-muted">No activity logged yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </div>
 
-<!-- Chart.js -->
+<!-- Chart.js & AOS JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script>
-    // Lead chart
-    const leadStatusLabels = {{ lead_status_labels|safe }};
-    const leadStatusCounts = {{ lead_status_counts|safe }};
+    AOS.init({ duration: 700, once: true });
 
-    const leadsCtx = document.getElementById('leadsChart').getContext('2d');
-    new Chart(leadsCtx, {
-        type: 'pie',
+    new Chart(document.getElementById('leadsChart'), {
+        type: 'bar',
         data: {
-            labels: leadStatusLabels,
+            labels: {{ lead_status_labels|safe }},
             datasets: [{
-                label: 'Lead Status',
-                data: leadStatusCounts,
-                backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6610f2']
+                label: 'Leads',
+                data: {{ lead_status_counts|safe }},
+                backgroundColor: ['#0d6efd', '#ffc107', '#20c997', '#dc3545']
             }]
         }
     });
 
-    // Communication chart
-    const commTypeLabels = {{ comm_type_labels|safe }};
-    const commTypeCounts = {{ comm_type_counts|safe }};
-
-    const commCtx = document.getElementById('commChart').getContext('2d');
-    new Chart(commCtx, {
-        type: 'bar',
+    new Chart(document.getElementById('commChart'), {
+        type: 'pie',
         data: {
-            labels: commTypeLabels,
+            labels: {{ comm_type_labels|safe }},
             datasets: [{
-                label: 'Communication Types',
-                data: commTypeCounts,
-                backgroundColor: ['#17a2b8', '#6f42c1', '#fd7e14']
+                data: {{ comm_type_counts|safe }},
+                backgroundColor: ['#0dcaf0', '#6f42c1', '#fd7e14']
+            }]
+        }
+    });
+
+    new Chart(document.getElementById('customerGrowthChart'), {
+        type: 'line',
+        data: {
+            labels: {{ customer_growth_labels|safe }},
+            datasets: [{
+                label: 'New Customers',
+                data: {{ customer_growth_counts|safe }},
+                borderColor: '#0ba29d',
+                backgroundColor: 'rgba(11, 162, 157, 0.1)',
+                tension: 0.3,
+                fill: true
             }]
         }
     });
 </script>
+
 {% endblock %}

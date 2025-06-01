@@ -2,67 +2,149 @@
 
 {% block content %}
 
+<style>
+    .card-header-custom {
+        background: linear-gradient(135deg, #0ba29d, #c3ec52);
+        color: white;
+        padding: 1.25rem;
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
 
-<div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Leads</h5>
-        <a class="btn btn-outline-primary btn-sm" href="{% url 'create-lead' %}">
-            + New Lead
-        </a>
+    .status-badge {
+        padding: 0.35em 0.75em;
+        border-radius: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .status-new { background-color: #17a2b8; color: white; }
+    .status-contacted { background-color: #ffc107; color: #212529; }
+    .status-qualified { background-color: #28a745; color: white; }
+    .status-closed { background-color: #dc3545; color: white; }
+
+    .lead-intro {
+        background: #e9f7f5;
+        border-left: 5px solid #0ba29d;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        border-radius: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .btn-create {
+        background-color: #ffffff;
+        color: #0ba29d;
+        border: 1px solid #fff;
+    }
+
+    .btn-create:hover {
+        background-color: #f8f9fa;
+        color: #0ba29d;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(11, 162, 157, 0.25);
+    }
+</style>
+
+<div class="container py-4">
+
+    <!-- Intro Text -->
+    <div class="lead-intro">
+        <i class="fa fa-info-circle me-1"></i>
+        <strong>Lead Management:</strong> Track prospects with status and notes. Click “+ New Lead” to expand your pipeline.
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-bordered mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Customer</th>
-                        <th>Status</th>
-                        <th>Note</th>
-                        <th>Created At</th>
-                        <th>Edit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for lead in leads %}
-                    <tr>
-                        <td>{{ lead.id }}</td>
-                        <td>{{ lead.customer.first_name }} {{ lead.customer.last_name }}</td>
-                        <td>{{ lead.status }}</td>
-                        <td>{{ lead.note }}</td>
-                        <td>{{ lead.created_at }}</td>
-                    <td>
-                        <a href="{% url 'update-lead' lead.id %}" class="btn btn-warning btn-sm">
-                            <i class="fa fa-edit"></i>
-                        </a>
-                    </td>
 
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Search Bar -->
+    <form method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="🔍 Search by name or status..." value="{{ search_query }}">
+            <button class="btn btn-outline-primary" type="submit">
+                <i class="fa fa-search"></i> Search
+            </button>
+        </div>
+    </form>
+
+    {% if search_query %}
+        <p class="text-muted mb-3">Showing results for <strong>{{ search_query }}</strong></p>
+    {% endif %}
+
+    <!-- Leads Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header-custom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fa fa-bullhorn me-2"></i>Leads</h5>
+            <a class="btn btn-create btn-sm fw-semibold" href="{% url 'create-lead' %}">+ New Lead</a>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Note</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in leads %}
+                        <tr>
+                            <td><strong>{{ lead.id }}</strong></td>
+                            <td>{{ lead.customer.first_name }} {{ lead.customer.last_name }}</td>
+                            <td>
+                                <span class="status-badge status-{{ lead.status }}">
+                                    {{ lead.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ lead.note|truncatechars:60 }}</td>
+                            <td>{{ lead.created_at|date:"M d, Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'update-lead' lead.id %}" class="btn btn-sm btn-outline-warning">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No leads found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="card-footer py-3 bg-light">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% if leads.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?lead_page={{ leads.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">Previous</a>
+                    </li>
+                    {% endif %}
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            Page {{ leads.number }} of {{ leads.paginator.num_pages }}
+                        </span>
+                    </li>
+                    {% if leads.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?lead_page={{ leads.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
     </div>
-    <div class="card-footer">
-        <nav>
-            <ul class="pagination justify-content-center">
-                {% if leads.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?lead_page={{ leads.previous_page_number }}">Previous</a>
-                    </li>
-                {% endif %}
-                <li class="page-item disabled">
-                    <span class="page-link">Page {{ leads.number }} of {{ leads.paginator.num_pages }}</span>
-                </li>
-                {% if leads.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?lead_page={{ leads.next_page_number }}">Next</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-    </div>
 </div>
-
 
 {% endblock %}

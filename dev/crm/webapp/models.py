@@ -42,10 +42,16 @@ class Communication(models.Model):
 
 
 
+class ActivityLog(models.Model):
+    ACTION_TYPES = [
+        ('create', 'Created'),
+        ('update', 'Updated'),
+        ('delete', 'Deleted'),
+        ('communicated', 'Communicated')
+    ]
 
-
-
-
-
-
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    model = models.CharField(max_length=50, default='Unknown')         # ✅ Default added
+    object_name = models.CharField(max_length=100, default='N/A')      # ✅ Default added
+    action = models.CharField(max_length=20, choices=ACTION_TYPES)
+    timestamp = models.DateTimeField(auto_now_add=True)

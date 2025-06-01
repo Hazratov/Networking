@@ -1,55 +1,85 @@
 {% extends 'webapp/base.html' %}
-
 {% load crispy_forms_tags %}
 
 {% block content %}
+<!-- AOS CSS -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
-    <body>
+<!-- Custom Styles -->
+<style>
+    body {
+        background: linear-gradient(135deg, #c3ec52 0%, #0ba29d 100%);
+        min-height: 100vh;
+    }
 
-        <div class="container bg-light shadow-md p-5 form-layout">
+    .register-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 3rem 2.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        transition: all 0.4s ease-in-out;
+    }
 
-            <h3> Create your account </h3>
+    .register-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
 
-            <h5> Start managing your clients today! </h5>
+    .icon-top {
+        font-size: 3.2rem;
+        color: #0ba29d;
+    }
 
-            <hr>
-            <br>
+    .form-link a {
+        color: #0ba29d;
+        text-decoration: none;
+        font-weight: 600;
+    }
 
-            <form method="POST" autocomplete="off">
+    .form-link a:hover {
+        text-decoration: underline;
+    }
+</style>
 
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="col-md-6" data-aos="zoom-in" data-aos-duration="800">
+        <div class="register-card text-center">
+            <div class="mb-3">
+                <i class="fa fa-user-circle icon-top"></i>
+            </div>
+            <h2 class="fw-bold text-dark mb-2">Create Your Account</h2>
+            <p class="text-muted mb-3">Start managing your clients today!</p>
+            <hr class="w-50 mx-auto">
+
+            <form method="POST" autocomplete="off" class="text-start mt-4">
                 {% csrf_token %}
 
-                {{form.username|as_crispy_field}}
+                <div class="mb-3">
+                    {{ form.username|as_crispy_field }}
+                </div>
+                <div class="mb-3">
+                    {{ form.password1|as_crispy_field }}
+                </div>
+                <div class="mb-4">
+                    {{ form.password2|as_crispy_field }}
+                </div>
 
-                <br>
-
-                {{form.password1|as_crispy_field}}
-
-                <br>
-
-                {{form.password2|as_crispy_field}}
-
-                <br>
-
-                <button type="submit" class="btn btn-primary w-100 btn-block p-2"> Create account &nbsp; <i class="fa fa-user" aria-hidden="true"></i> </button>
-
-
+                <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">
+                    <i class="fa fa-user-plus"></i> &nbsp; Create Account
+                </button>
             </form>
 
-            <br>
-
-            <div class="text-center">
-
-                <p> Already have an account? </p> <a href="{% url 'my-login' %}"> Login </a>
-
+            <div class="form-link mt-4">
+                <p class="mb-1">Already have an account?</p>
+                <a href="{% url 'my-login' %}">Login here</a>
             </div>
-
-
         </div>
+    </div>
+</div>
 
-        <br>
-
-    </body>
-
-
+<!-- AOS JS -->
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+    AOS.init();
+</script>
 {% endblock %}

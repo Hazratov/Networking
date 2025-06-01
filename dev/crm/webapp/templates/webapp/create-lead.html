@@ -1,25 +1,62 @@
 {% extends 'webapp/base.html' %}
-{% load form_tags %}  {# agar add_class filterdan foydalansangiz kerak bo‘ladi #}
+{% load form_tags %}  {# required for add_class #}
 
 {% block content %}
 
+<style>
+    .gradient-header {
+        background: linear-gradient(135deg, #0ba29d, #c3ec52);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
+
+    .lead-intro {
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.25rem;
+        background: #e9f7f5;
+        border-left: 5px solid #0ba29d;
+        border-radius: 0.75rem;
+        color: #333;
+    }
+
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+    }
+</style>
+
 <div class="container mt-4">
+    <!-- Page Title + Navigation -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3><i class="fa fa-user-plus text-primary"></i> &nbsp; Create a New Lead</h3>
         <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">⬅️ Back to Dashboard</a>
     </div>
 
+    <!-- Optional Intro -->
+    <div class="lead-intro">
+        <i class="fa fa-info-circle me-1"></i>
+        Use this form to register a new lead into the system. Fields like status and assignment are required to help your team manage follow-ups effectively.
+    </div>
+
+    <!-- Card Container -->
     <div class="card shadow-lg rounded-3">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="fa fa-user-tie"></i> Lead Information</h5>
+        <div class="gradient-header">
+            <h5 class="mb-0"><i class="fa fa-user-tie me-1"></i> Lead Information</h5>
         </div>
-        <div class="card-body">
+        <div class="card-body px-4 py-4">
             <form method="post" novalidate>
                 {% csrf_token %}
 
-                {% for field in form %}
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                <div class="row">
+                    {% for field in form %}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ field.label }}</label>
                         {{ field|add_class:"form-control form-control-lg" }}
 
                         {% if field.help_text %}
@@ -30,10 +67,12 @@
                             <div class="text-danger small">{{ error }}</div>
                         {% endfor %}
                     </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
 
-                <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">
-                    <i class="fa fa-paper-plane"></i> &nbsp; Submit Lead
+                <!-- Submit -->
+                <button type="submit" class="btn btn-success btn-lg w-100 mt-4">
+                    <i class="fa fa-paper-plane me-1"></i> Submit Lead
                 </button>
             </form>
         </div>

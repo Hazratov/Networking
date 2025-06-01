@@ -1,66 +1,157 @@
 {% extends 'webapp/base.html' %}
+{% load static %}
 
 {% block content %}
 
-<div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Communications</h5>
-        <a class="btn btn-outline-primary btn-sm" href="{% url 'create-communication' %}">
-            + New Communication
-        </a>
+<style>
+    .card-header-custom {
+        background: linear-gradient(135deg, #0ba29d, #c3ec52);
+        color: white;
+        padding: 1.25rem;
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+
+    .comm-intro {
+        background: #e9f7f5;
+        border-left: 5px solid #0ba29d;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        border-radius: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .comm-type-badge {
+        padding: 0.35em 0.75em;
+        border-radius: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: capitalize;
+        color: white;
+    }
+
+    .call { background-color: #0d6efd; }
+    .email { background-color: #6f42c1; }
+    .meeting { background-color: #fd7e14; }
+
+    .btn-create {
+        background-color: #ffffff;
+        color: #0ba29d;
+        border: 1px solid #fff;
+    }
+
+    .btn-create:hover {
+        background-color: #f8f9fa;
+        color: #0ba29d;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .search-bar .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(11, 162, 157, 0.25);
+    }
+</style>
+
+<div class="container py-4">
+    <!-- Intro Block -->
+    <div class="comm-intro">
+        <i class="fa fa-comment-alt me-1"></i>
+        <strong>Communication Log:</strong>
+        Track all customer interactions — calls, emails, meetings. Use filters and pagination to browse history.
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-bordered mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Customer</th>
-                        <th>Type</th>
-                        <th>Note</th>
-                        <th>Date</th>
-                        <th>Edit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for com in communications %}
-                    <tr>
-                        <td>{{ com.id }}</td>
-                        <td>{{ com.customer.first_name }} {{ com.customer.last_name }}</td>
-                        <td>{{ com.type }}</td>
-                        <td>{{ com.note }}</td>
-                        <td>{{ com.date }}</td>
-                        <td>
-                            <a href="{% url 'update-communication' com.id %}" class="btn btn-warning btn-sm">
-                                <i class="fa fa-edit"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+    <!-- Search Bar -->
+    <form method="get" class="mb-3 search-bar">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="🔍 Search by name or type..." value="{{ search_query }}">
+            <button class="btn btn-outline-primary" type="submit">
+                <i class="fa fa-search"></i> Search
+            </button>
         </div>
-    </div>
-    <div class="card-footer">
-        <nav>
-            <ul class="pagination justify-content-center">
-                {% if communications.has_previous %}
+    </form>
+
+    {% if search_query %}
+        <p class="text-muted mb-3">Showing results for <strong>{{ search_query }}</strong></p>
+    {% endif %}
+
+    <!-- Table Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header-custom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fa fa-comments me-2"></i> Communications</h5>
+            <a class="btn btn-create btn-sm fw-semibold" href="{% url 'create-communication' %}">
+                + New Communication
+            </a>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Type</th>
+                            <th>Note</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for com in communications %}
+                        <tr>
+                            <td><strong>{{ com.id }}</strong></td>
+                            <td>{{ com.customer.first_name }} {{ com.customer.last_name }}</td>
+                            <td>
+                                <span class="comm-type-badge {{ com.type|lower }}">
+                                    {{ com.get_type_display }}
+                                </span>
+                            </td>
+                            <td>{{ com.note|truncatechars:60 }}</td>
+                            <td>{{ com.date|date:"M d, Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'update-communication' com.id %}" class="btn btn-sm btn-outline-warning">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No communications found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="card-footer py-3 bg-light">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% if communications.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?comm_page={{ communications.previous_page_number }}">Previous</a>
+                        <a class="page-link" href="?comm_page={{ communications.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">
+                            Previous
+                        </a>
                     </li>
-                {% endif %}
-                <li class="page-item disabled">
-                    <span class="page-link">Page {{ communications.number }} of {{ communications.paginator.num_pages }}</span>
-                </li>
-                {% if communications.has_next %}
+                    {% endif %}
+
+                    <li class="page-item disabled">
+                        <span class="page-link">Page {{ communications.number }} of {{ communications.paginator.num_pages }}</span>
+                    </li>
+
+                    {% if communications.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?comm_page={{ communications.next_page_number }}">Next</a>
+                        <a class="page-link" href="?comm_page={{ communications.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">
+                            Next
+                        </a>
                     </li>
-                {% endif %}
-            </ul>
-        </nav>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
 
 {% endblock %}
-

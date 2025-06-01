@@ -1,74 +1,194 @@
 {% extends 'webapp/base.html' %}
+{% load static %}
 
 {% block content %}
 
-<div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Customers</h5>
-        <a class="btn btn-outline-primary btn-sm" href="{% url 'create-record' %}">
-            + New Customer
-        </a>
+<!-- Styling -->
+<style>
+    .card-custom {
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header-custom {
+        background: linear-gradient(120deg, #0ba29d, #68c850);
+        color: white;
+        padding: 1.5rem 1.75rem;
+    }
+
+    .card-header-custom h5 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .intro-text {
+        margin-bottom: 2rem;
+        background: #e9f7f5;
+        border-left: 5px solid #0ba29d;
+        padding: 1.25rem 1.5rem;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .intro-text i {
+        color: #0ba29d;
+        margin-right: 0.5rem;
+    }
+
+    .search-bar input {
+        height: 48px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    .search-bar button {
+        border-radius: 8px;
+    }
+
+    .table-custom thead th {
+        background-color: #f1f3f5;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+    }
+
+    .table-custom tbody td {
+        vertical-align: middle;
+    }
+
+    .table-custom tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-outline-warning i {
+        opacity: 0.85;
+    }
+
+    .btn-create {
+        background: white;
+        color: #0ba29d;
+        font-weight: 600;
+        border: 2px solid #fff;
+        transition: all 0.3s ease;
+    }
+
+    .btn-create:hover {
+        background: white;
+        color: #0ba29d;
+        box-shadow: 0 0 0 2px #0ba29d inset;
+    }
+
+    .pagination .page-link {
+        border-radius: 6px;
+    }
+</style>
+
+<div class="container py-4">
+
+    <!-- Info Banner -->
+    <div class="intro-text">
+        <i class="fa fa-info-circle"></i>
+        <strong>Customer Directory:</strong> Search, view, and manage your CRM customer list with ease.
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Full Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Address</th>
-                        <th>City</th>
-                        <th>Province</th>
-                        <th>Country</th>
-                        <th>Joined</th>
-                        <th>Created By</th>
-                        <th>Edit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for record in records %}
-                    <tr>
-                        <td>{{ record.id }}</td>
-                        <td>{{ record.first_name }} {{ record.last_name }}</td>
-                        <td>{{ record.email }}</td>
-                        <td>{{ record.phone }}</td>
-                        <td>{{ record.address }}</td>
-                        <td>{{ record.city }}</td>
-                        <td>{{ record.province }}</td>
-                        <td>{{ record.country }}</td>
-                        <td>{{ record.creation_date }}</td>
-                        <td>{{ record.created_by }}</td>
-                        <td>
-                            <a href="{% url 'update-record' record.id %}" class="btn btn-warning btn-sm">
-                                <i class="fa fa-edit"></i>
-                            </a>
-                    </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+    <!-- Search -->
+    <form method="get" class="mb-4 search-bar">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control shadow-sm" placeholder="🔍 Search by name, email, city, or country" value="{{ search_query }}">
+            <button class="btn btn-outline-primary" type="submit">
+                <i class="fa fa-search"></i> Search
+            </button>
         </div>
-    </div>
-    <div class="card-footer">
-        <nav>
-            <ul class="pagination justify-content-center">
-                {% if records.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?record_page={{ records.previous_page_number }}">Previous</a>
+    </form>
+
+    {% if search_query %}
+    <p class="mb-3 text-muted">
+        Showing results for: <strong>{{ search_query }}</strong>
+    </p>
+    {% endif %}
+
+    <!-- Customer Table -->
+    <div class="card card-custom mb-5">
+        <div class="card-header-custom d-flex justify-content-between align-items-center">
+            <h5><i class="fa fa-users me-2"></i> Customers</h5>
+            <a href="{% url 'create-record' %}" class="btn btn-create btn-sm">
+                <i class="fa fa-plus"></i> Add New
+            </a>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-custom align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>City</th>
+                            <th>Province</th>
+                            <th>Country</th>
+                            <th>Joined</th>
+                            <th>Created By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td><strong>{{ record.id }}</strong></td>
+                            <td>{{ record.first_name }} {{ record.last_name }}</td>
+                            <td>{{ record.email }}</td>
+                            <td>{{ record.phone }}</td>
+                            <td>{{ record.address }}</td>
+                            <td>{{ record.city }}</td>
+                            <td>{{ record.province }}</td>
+                            <td>{{ record.country }}</td>
+                            <td>{{ record.creation_date|date:"Y-m-d" }}</td>
+                            <td>{{ record.created_by }}</td>
+                            <td>
+                                <a href="{% url 'update-record' record.id %}" class="btn btn-sm btn-outline-warning">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="11" class="text-center text-muted">No customer records found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="card-footer py-3 bg-light">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% if records.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?record_page={{ records.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            Page {{ records.number }} of {{ records.paginator.num_pages }}
+                        </span>
                     </li>
-                {% endif %}
-                <li class="page-item disabled">
-                    <span class="page-link">Page {{ records.number }} of {{ records.paginator.num_pages }}</span>
-                </li>
-                {% if records.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?record_page={{ records.next_page_number }}">Next</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
+
+                    {% if records.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?record_page={{ records.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
 
