@@ -6,39 +6,40 @@ from faker import Faker
 from datetime import timedelta
 from django.utils.timezone import now
 
-# Set up Django
+# Django sozlash
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'crm.settings')
 django.setup()
 
-# Import models
+# Modellarni chaqirish
 from django.contrib.auth.models import User
-from webapp.models import Record, Lead, Communication, ActivityLog  # make sure ActivityLog exists
+from webapp.models import Record, Lead, Communication, ActivityLog
 
 fake = Faker()
 
-def log_activity(user, model_name, object_name, action):
-    ActivityLog.objects.create(
-        user=user,
-        model=model_name,
-        object_name=object_name,
-        action=action
-    )
+
+def log_bulk_activities(logs):
+    """Activity loglarni samarali bulk orqali qo‘shish"""
+    ActivityLog.objects.bulk_create(logs, batch_size=1000)
 
 
-def create_records(n=50):
-    records = []
+def create_records(n=10000):
     users = list(User.objects.all())
     if not users:
-        print("❌ No users found. Please create at least one superuser.")
+        print("❌ Hech qanday foydalanuvchi topilmadi. Avval superuser yarating.")
         return []
+
+    records = []
+    activity_logs = []
 
     for _ in range(n):
         user = random.choice(users)
-        record = Record.objects.create(
-            first_name=fake.first_name(),
-            last_name=fake.last_name(),
-            email=fake.unique.email(),
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        record = Record(
+            first_name=first_name,
+            last_name=last_name,
+            email=f"{first_name.lower()}.{last_name.lower()}{random.randint(1000, 9999)}@example.com",
             phone=fake.phone_number(),
             address=fake.address(),
             city=fake.city(),
@@ -47,45 +48,78 @@ def create_records(n=50):
             created_by=user
         )
         records.append(record)
-        log_activity(user, "Customer", f"{record.first_name} {record.last_name}", "create")
-    return records
+        activity_logs.append(ActivityLog(
+            user=user,
+            model="Customer",
+            object_name=f"{first_name} {last_name}",
+            action="create"
+        ))
+
+    created_records = Record.objects.bulk_create(records, batch_size=500)
+    log_bulk_activities(activity_logs)
+    return created_records
 
 
 def create_leads(records):
-    statuses = ['new', 'contacted', 'qualified', 'closed']
     users = list(User.objects.all())
+    statuses = ['new', 'contacted', 'qualified', 'closed']
+
+    leads = []
+    logs = []
 
     for record in records:
         assigned_user = random.choice(users)
-        lead = Lead.objects.create(
+        lead = Lead(
             customer=record,
             status=random.choice(statuses),
             assigned_to=assigned_user,
             note=fake.text(),
             created_at=now() - timedelta(days=random.randint(0, 60))
         )
-        log_activity(assigned_user, "Lead", f"{record.first_name} {record.last_name}", "create")
+        leads.append(lead)
+        logs.append(ActivityLog(
+            user=assigned_user,
+            model="Lead",
+            object_name=f"{record.first_name} {record.last_name}",
+            action="create"
+        ))
+
+    Lead.objects.bulk_create(leads, batch_size=500)
+    log_bulk_activities(logs)
 
 
 def create_communications(records):
     types = ['call', 'email', 'meeting']
+    communications = []
+    logs = []
+
     for record in records:
-        for _ in range(random.randint(1, 3)):
-            future_days = random.randint(-5, 10)  # 👈 allows both past & future dates
-            Communication.objects.create(
+        for _ in range(random.randint(1, 2)):
+            comm_type = random.choice(types)
+            comm = Communication(
                 customer=record,
-                type=random.choice(types),
+                type=comm_type,
                 note=fake.text(),
-                date=now() + timedelta(days=future_days)  # ✅ future date support
+                date=now() + timedelta(days=random.randint(-5, 10))
             )
-            log_activity(record.created_by, "Communication", f"{record.first_name} {record.last_name}", "communicated")
+            communications.append(comm)
+            logs.append(ActivityLog(
+                user=record.created_by,
+                model="Communication",
+                object_name=f"{record.first_name} {record.last_name}",
+                action="communicated"
+            ))
+
+    Communication.objects.bulk_create(communications, batch_size=500)
+    log_bulk_activities(logs)
 
 
 if __name__ == '__main__':
-    print("🚀 Generating fake CRM data...")
-
-    records = create_records(100)
+    print("🚀 Fake CRM ma'lumotlari yaratilmoqda...")
+    records = create_records(1000)
     if records:
         create_leads(records)
         create_communications(records)
-        print("✅ Test data created successfully.")
+        print("✅ Ma'lumotlar muvaffaqiyatli yaratildi.")
+    else:
+        print("⚠️ Foydalanuvchilar yo‘qligi sababli hech narsa yaratilmadi.")
