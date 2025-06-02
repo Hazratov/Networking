@@ -313,9 +313,37 @@ def delete_record(request, pk):
 
     record.delete()
 
-    messages.success(request, "Your record was deleted!")
+    messages.success(request, "Your customer was deleted!")
 
-    return redirect("dashboard")
+    return redirect("customers-table")
+
+
+# - Delete a lead
+
+@login_required(login_url='my-login')
+def delete_lead(request, pk):
+
+    leads = Lead.objects.get(id=pk)
+
+    leads.delete()
+
+    messages.success(request, "Your lead was deleted!")
+
+    return redirect("leads-table")
+
+# - Delete a Communications
+
+@login_required(login_url='my-login')
+def delete_communication(request, pk):
+
+    communications = Communication.objects.get(id=pk)
+
+    communications.delete()
+
+    messages.success(request, "Your communication was deleted!")
+
+    return redirect("communications-table")
+
 
 
 

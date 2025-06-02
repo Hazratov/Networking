@@ -18,10 +18,12 @@ urlpatterns = [
     # Leads
     path('leads', views.lead_list, name='lead-list'),
     path('leads/create', views.create_lead, name='create-lead'),
+    path('delete-lead/<int:pk>', views.delete_lead, name="delete-lead"),
 
     # Communication logs
     path('communications', views.communication_list, name='communication-list'),
     path('communications/create', views.create_communication, name='create-communication'),
+    path('delete-communication/<int:pk>', views.delete_communication, name="delete-communication"),
 
     #list customer
     path('customers-table/', views.customer_table_view, name='customers-table'),

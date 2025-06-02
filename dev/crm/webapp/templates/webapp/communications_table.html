@@ -95,6 +95,7 @@
                             <th>Note</th>
                             <th>Date</th>
                             <th>Actions</th>
+                            <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -112,6 +113,11 @@
                             <td>
                                 <a href="{% url 'update-communication' com.id %}" class="btn btn-sm btn-outline-warning">
                                     <i class="fa fa-edit"></i>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{% url 'delete-communication' com.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fa fa-trash"></i>
                                 </a>
                             </td>
                         </tr>

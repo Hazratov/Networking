@@ -134,6 +134,7 @@
                             <th>Joined</th>
                             <th>Created By</th>
                             <th>Actions</th>
+                            <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -152,6 +153,11 @@
                             <td>
                                 <a href="{% url 'update-record' record.id %}" class="btn btn-sm btn-outline-warning">
                                     <i class="fa fa-edit"></i>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{% url 'delete-record' record.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fa fa-trash"></i>
                                 </a>
                             </td>
                         </tr>
